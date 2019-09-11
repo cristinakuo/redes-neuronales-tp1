@@ -5,6 +5,7 @@ import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 from others import sgn
+from others import add_noise
 
 logging.basicConfig(level=logging.INFO, format="[%(asctime)s] %(levelname)s - %(message)s") 
 log = logging.getLogger(__name__) # TODO: whats this
@@ -57,14 +58,16 @@ class HopfieldNet:
             for j in range(self.N):
                 self.W[i,j] = _get_Wij(i,j)
 
-    # Asynchronic            
-    def refresh_net(self, s, render): #TODO: synchronic
+         
+    def refresh_net(self, s, render):   # Asynchronic     
         if render:
             im, bitmap = image.render_image(s, self.rows, self.cols)
         
         refreshed_s = np.copy(s)
+        
         for i in tqdm(np.random.permutation(self.N)):
             refreshed_s[i] = sgn(sum(self.W[i,:]*refreshed_s))
+            
             if render and refreshed_s[i] != s[i]:
                 im, bitmap = image.render_pixel(im, bitmap, refreshed_s[i], i%self.cols, int(np.floor(i/self.cols)))
         return refreshed_s
@@ -74,7 +77,7 @@ class HopfieldNet:
             raise("No synaptic wighttrained.")
         
         if len(s) != self.N:
-            raise("Dimenions mismatch")
+            raise("Dimensions mismatch")
 
         return -0.5*sum(np.dot(self.W, s))
 
@@ -88,12 +91,15 @@ class HopfieldNet:
         current_H = 0
         previous_H = 0
         for i in range(self.max_iteration):
-            log.debug("Iteration {}".format(i+1))
-            log.debug("Refreshing net...")
+            log.info("Iteration {}".format(i+1))
+            
+            log.info("Refreshing net...")    
             s = self.refresh_net(s, render=render)
-            log.debug("Calculating energy...")
+            
+            log.info("Calculating energy...")
             previous_H = current_H
             current_H = self.get_energy(s)
+            
             if current_H == previous_H:
                 log.info("Reached minimum energy ('{}').".format(current_H))
                 break
@@ -104,10 +110,13 @@ class HopfieldNet:
     def test(self,testing_set):
         log.info("Testing patterns...")
         for test in testing_set:
+
             s = image.load_binary_image(test)["data"]
-            # TODO: add noise
-            #image.render_image(s,self.rows,self.cols)
-            #input("Press enter to continue...")
+            
+            s = add_noise(s, 0.25)
+            image.render_image(s,self.rows,self.cols)
+            input("Press enter to continue...")
+            
             net = self.evaluate_net(s,render=True)
             image.render_image(net, self.rows, self.cols)
             input("Press enter to continue...")
@@ -120,10 +129,11 @@ def main():
 
     training_set = [
         "img/panda.bmp",
-        "img/v.bmp"
+        "img/v.bmp",
+        "img/perro.bmp"
     ]
     testing_set = [
-        "img/perro.bmp"
+        "img/panda.bmp"
     ]
 
     myHop = HopfieldNet()
