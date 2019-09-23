@@ -16,7 +16,6 @@ class HopfieldNet:
         self.patterns = []
         self.W = np.zeros(0) # Synaptic weight matrix
         self.N = None # Number of neurons
-        self.max_iteration = 20
 
     def load_image_pattern(self, file_name):
         log.info("Loading binary file: '{}'...".format(file_name))
@@ -68,7 +67,7 @@ class HopfieldNet:
                 self.W[i,j] = _get_Wij(i,j)
 
          
-    def refresh_net(self, s, render):   # Asynchronic     
+    def refresh_asynchronic(self, s, render):   # Asynchronic     
         if render:
             im, bitmap = image.render_image(s, self.rows, self.cols)
         
@@ -98,20 +97,28 @@ class HopfieldNet:
 
         return -0.5*sum(np.dot(self.W, s))
 
-    def evaluate_net(self, s, render=False):
+    def evaluate_net(self, s, refresh_type='async', max_iteration=20, render=False):
         if not self.W.any():
             raise("No synaptic weight matrix trained.")
         
         if len(s) != self.N:
             raise("Dimensions mismatch.")
 
+        if refresh_type == 'async':
+            refresh = self.refresh_asynchronic
+        elif refresh_type == 'sync':
+            refresh = self.refresh_synchronic
+        else:
+            raise("Not a refresh type.")
+
+    
         current_H = 0
         previous_H = 0
-        for i in range(self.max_iteration):
+        for i in range(max_iteration):
             log.info("Iteration {}".format(i+1))
             
             log.info("Refreshing net...")    
-            s = self.refresh_synchronic(s, render=render)
+            s = refresh(s, render=render)
             
             log.info("Calculating energy...")
             previous_H = current_H
@@ -136,9 +143,6 @@ class HopfieldNet:
             s_refreshed = self.evaluate_net(s_noisy,render=False)
             log.info("Error rate is: '{}'".format(self.get_error(s,s_refreshed)))
 
-    def set_max_iterations(self,n):
-        self.max_iteration = n
-        log.info("Max iterations set to: '{}'".format(n))
 
 
 

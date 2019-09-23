@@ -14,7 +14,7 @@ def test(neural_net, testing_set, render=False):
         image.render_image(test_pattern_noisy, neural_net.rows, neural_net.cols)
         input("Press enter to continue...")
         
-        refreshed = neural_net.evaluate_net(test_pattern_noisy, render)
+        refreshed = neural_net.evaluate_net(test_pattern_noisy, 'async', 20,render=render)
         
         image.render_image(refreshed, neural_net.rows, neural_net.cols)
         input("Press enter to continue...")
