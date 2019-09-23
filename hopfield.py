@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from utils import *
 
 logging.basicConfig(level=logging.INFO, format="[%(asctime)s] %(levelname)s - %(message)s") 
-log = logging.getLogger(__name__) # TODO: whats this
+log = logging.getLogger(__name__) 
 
 class HopfieldNet:
     def __init__(self):
@@ -83,8 +83,7 @@ class HopfieldNet:
 
     def refresh_synchronic(self, s, render):
         refreshed = [sgn(x) for x in np.dot(self.W,s)]
-        #refreshed = np.array(map(sgn, np.dot(self.W,s))) # No se por que esto me da mal
-        # TODO: chequear cuando tengo que renderizar
+        # TODO: ver eso de render image
         if render:
             im, bitmap = image.render_image(refreshed, self.rows, self.cols)
         
@@ -129,22 +128,6 @@ class HopfieldNet:
         n_wrong_bits = np.count_nonzero(s-refreshed)
         return n_wrong_bits/self.N
 
-    def test(self,testing_set,render=False):
-        log.info("Testing patterns...")
-        for test in testing_set:
-
-            s = image.load_binary_image(test)["data"]
-            
-            s_noisy = add_noise(s, 0.25)
-            image.render_image(s_noisy,self.rows,self.cols)
-            input("Press enter to continue...")
-            
-            s_refreshed = self.evaluate_net(s_noisy,render)
-            image.render_image(s_refreshed, self.rows, self.cols)
-            input("Press enter to continue...")
-
-            log.info("Error rate is: '{}'".format(self.get_error(s,s_refreshed)))
-
     # TODO: ver donde lo uso
     def test_patterns(self,testing_patterns):
         log.info("Testing patterns...")
@@ -156,23 +139,6 @@ class HopfieldNet:
     def set_max_iterations(self,n):
         self.max_iteration = n
         log.info("Max iterations set to: '{}'".format(n))
-
-def ej_1():
-    plt.ion()
-
-    training_set = [
-        "img/panda.bmp",
-        "img/v.bmp",
-        "img/perro.bmp"
-    ]
-    testing_set = [
-        "img/panda.bmp"
-    ]
-
-    myHop = HopfieldNet()
-    myHop.load_image_patterns(training_set)
-    myHop.train()
-    myHop.test(testing_set, True)
 
 
 
