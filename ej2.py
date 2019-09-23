@@ -9,9 +9,8 @@ import logging
 logging.basicConfig(level=logging.INFO, format="[%(asctime)s] %(levelname)s - %(message)s") 
 log = logging.getLogger(__name__)
 
-def get_capacity_with_Perror_ref(P_error_ref):
+def get_capacity(P_error_ref):
     
-
     N=100
 
     log.info("Start process...")
@@ -47,7 +46,7 @@ def main():
 
     results = []
     for p in P_errors_ref:
-        results.append(get_capacity_with_Perror_ref(p))
+        results.append(get_capacity(p))
 
     print(tabulate(results, headers=['P_err reached', 'Capacity']))
 
