@@ -18,8 +18,7 @@ class HopfieldNet:
         self.N = None # Number of neurons
         self.max_iteration = 20
 
-    # TODO: refactor to reuse the load pattern
-    def load_pattern(self, file_name):
+    def load_image_pattern(self, file_name):
         log.info("Loading binary file: '{}'...".format(file_name))
         img = image.load_binary_image(file_name)
         cols, rows = img["cols"], img["rows"]
@@ -29,16 +28,15 @@ class HopfieldNet:
             self.cols, self.rows = cols, rows
             self.N = cols * rows
             log.info("Using N={} neurons.".format(self.N))
-        else:
-            if self.cols != cols or self.rows != rows:
+        elif self.cols != cols or self.rows != rows:
                 raise Exception("Dimensions mismatch: '{}x{}' - '{}x{} (ROWSxCOLS)'".format(self.cols, self.rows, rows, cols))
 
-        self.patterns.append(img["data"])
+        self.load_pattern_arr(img["data"])
 
-    def load_patterns(self, file_names):
+    def load_image_patterns(self, file_names):
         log.info("Loading training images...")
         for f in file_names:
-            self.load_pattern(f)
+            self.load_image_pattern(f)
 
     # Sin imagen
     def load_pattern_arr(self, p):
@@ -172,7 +170,7 @@ def ej_1():
     ]
 
     myHop = HopfieldNet()
-    myHop.load_patterns(training_set)
+    myHop.load_image_patterns(training_set)
     myHop.train()
     myHop.test(testing_set, True)
 
