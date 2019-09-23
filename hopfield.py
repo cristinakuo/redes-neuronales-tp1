@@ -143,6 +143,12 @@ class HopfieldNet:
             s_refreshed = self.evaluate_net(s_noisy,render=False)
             log.info("Error rate is: '{}'".format(self.get_error(s,s_refreshed)))
 
+    def random_disconnect(self, proportion):
+        row_index = np.random.permutation(range(self.N))
+        col_index = np.random.permutation(range(self.N))
+        lim = int(np.floor(proportion*self.N))
+        for (i,j) in zip(row_index[:lim],col_index[:lim]):
+            self.W[i,j] = 0
 
 
 
