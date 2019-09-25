@@ -1,7 +1,8 @@
 import numpy as np
 
-def sgn(n):
-		return 1 if n>=0 else -1
+
+def sgn(n,ref=0):
+		return 1 if n>=ref else -1
 
 def add_noise(s,proportion):
     n = int(proportion*len(s))
