@@ -1,6 +1,8 @@
 import numpy as np
 from utils import sgn
 
+TEMPERATURE_DECREASING_FACTOR = 0.95
+TEMPERATURE_MAX_STEP_COUNT = 2048
 
 class IsingModel():
 
@@ -30,7 +32,13 @@ class IsingModel():
         self.magnetization = self.lattice.sum()
 
     def _update_temperature(self):
-        self.temperature_step_count += 1
+        if self.temperature_step_count == TEMPERATURE_MAX_STEP_COUNT:
+            self.temperature *= TEMPERATURE_DECREASING_FACTOR
+            self.temperature_step_count = 0
+            self.temperature_step_count += 1
+        else:
+            self.temperature_step_count += 1
+
 
     def _getLatticeWithFlippedCandidateAt(self, index):
         new_lattice = np.copy(self.lattice)
