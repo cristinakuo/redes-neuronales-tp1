@@ -21,9 +21,7 @@ def get_capacity(P_error_ref):
         for p in patterns:
             myHop.load_pattern_arr(p)
         myHop.train()
-
         myHop.random_disconnect(0.1)
-        errors = []
         for p in patterns:
             errors.append(myHop.refresh_synchronic(p, render=False) - p)
             
