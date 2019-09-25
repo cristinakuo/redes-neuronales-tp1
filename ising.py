@@ -1,6 +1,11 @@
 import numpy as np
 from utils import sgn
 
+import matplotlib
+matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
+plt.ion()
+
 TEMPERATURE_DECREASING_FACTOR = 0.95
 TEMPERATURE_MAX_STEP_COUNT = 2048
 
@@ -11,7 +16,6 @@ class IsingModel():
         self.cols = cols
         # Inicializo lattice totalmente randomly
         self.lattice = np.vectorize(sgn)( np.random.rand(self.rows,self.cols), 0.5)
-        print(self.lattice)
         self.temperature = init_temp
         self.temperature_step_count = 0
         self.magnetization = self.lattice.sum()
@@ -87,17 +91,34 @@ class IsingModel():
         self._update_magnetization()
         self._update_temperature()
 
-    def run(self):  
+    def run(self,axs):  
         while abs(self.magnetization != self.rows*self.cols):
             self._iterate()
             #self._render_plot(a)
-        
+            self.render_plot(axs, force=False)
+        self.render_plot(axs)
         print(self.lattice)
 
-
+    def render_plot(self, axs, force=True):
+        # Se renderiza unicamente si se fuerza o esta en el ultimo paso
+        if force or self.temperature_step_count == TEMPERATURE_MAX_STEP_COUNT:
+            axs[0].clear()
+            axs[0].set_title('Ising Model Simulation')
+            axs[0].imshow(self.lattice,vmin=-1, vmax=1)
+            axs[1].semilogx(self.temperature, self.magnetization, "ob")
+            plt.show()
+            plt.pause(1e-12)
 
 
 if __name__ == '__main__':
-    ismo = IsingModel(4,4,20)
-    ismo.run()
+    ismo = IsingModel(10,10,10)
+    fig, axs = plt.subplots(1, 2)
+    axs[1].set_title('Magnetization Curve')
+    axs[1].set_xlabel('Temperature')
     
+    while abs(ismo.magnetization != ismo.rows*ismo.cols):
+        ismo._iterate()
+        #self._render_plot(a)
+        ismo.render_plot(axs, force=False)
+    ismo.render_plot(axs)
+    input("Press Enter to exit...")
