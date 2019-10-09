@@ -9,9 +9,11 @@ import logging
 logging.basicConfig(level=logging.INFO, format="[%(asctime)s] %(levelname)s - %(message)s") 
 log = logging.getLogger(__name__)
 
+# Check Hopfield Net's capacity statistically, for different admisible errors
+
 def get_capacity(P_error_ref):
     
-    N=100
+    N=100 # Number of neurons
 
     log.info("Start process...")
     step_size = 10
@@ -20,7 +22,6 @@ def get_capacity(P_error_ref):
 
     pattern_count = 0
     P_error = 0
-    #with Spinner("Processing...") as bar:
     while P_error < P_error_ref:
         pattern_count += 1
         patterns = gen_list_of_patterns(N,pattern_count)
@@ -44,9 +45,10 @@ def get_capacity(P_error_ref):
 def main():
     P_errors_ref = [0.001, 0.0036, 0.01, 0.05, 0.1]
 
-    results = []
+    capacities = []
     for p in P_errors_ref:
-        results.append(get_capacity(p))
+        capacity = get_capacity(p)
+        capacities.append(capacity)
 
     print(tabulate(results, headers=['P_err reached', 'Capacity']))
 
