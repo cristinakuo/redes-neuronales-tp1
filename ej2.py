@@ -1,4 +1,4 @@
-from hopfield import HopfieldNet
+from hopfield import *
 import numpy as np 
 from tqdm import tqdm
 from progress.spinner import Spinner
@@ -10,47 +10,16 @@ logging.basicConfig(level=logging.INFO, format="[%(asctime)s] %(levelname)s - %(
 log = logging.getLogger(__name__)
 
 # Check Hopfield Net's capacity statistically, for different admisible errors
-
-def get_capacity(P_error_ref):
-    
-    N=100 # Number of neurons
-
-    log.info("Start process...")
-    step_size = 10
-
-    results = list()
-
-    pattern_count = 0
-    P_error = 0
-    while P_error < P_error_ref:
-        pattern_count += 1
-        patterns = gen_list_of_patterns(N,pattern_count)
-        myHop = HopfieldNet()
-        for p in patterns:
-            myHop.load_pattern_arr(p)
-        myHop.train()
-        errors = []
-        for p in patterns:
-            errors.append(myHop.refresh_synchronic(p, render=False) - p)
-            
-        errors = np.vstack(errors)
-        error_count = len(np.flatnonzero(errors))
-        P_error = np.true_divide(error_count, N * pattern_count)
-            #bar.next()
-    capacity = np.true_divide(pattern_count,N)
-    
-
-    return (P_error, capacity)
-
 def main():
     P_errors_ref = [0.001, 0.0036, 0.01, 0.05, 0.1]
 
     capacities = []
     for p in P_errors_ref:
-        capacity = get_capacity(p)
+        capacity = get_capacity(neurons=100, P_error_ref=p)
         capacities.append(capacity)
 
-    print(tabulate(results, headers=['P_err reached', 'Capacity']))
+    results_table = tabulate(capacities, headers=['P_err reached', 'Capacity'])
+    print(results_table)
 
 if __name__ == '__main__':
     main()

@@ -151,7 +151,36 @@ class HopfieldNet:
             self.W[i,j] = 0
 
 
+def get_capacity(neurons,P_error_ref, disconnect_proportion=0): 
+    N=neurons # Number of neurons
+    step_size = 10
 
+    results = list()
+
+    pattern_count = 0
+    P_error = 0
+    while P_error < P_error_ref:
+        pattern_count += 1
+        patterns = gen_list_of_patterns(N,pattern_count)
+        myHop = HopfieldNet()
+        for p in patterns:
+            myHop.load_pattern_arr(p)
+        
+        myHop.train()
+        myHop.random_disconnect(disconnect_proportion)
+
+        errors = []
+        for p in patterns:
+            errors.append(myHop.refresh_synchronic(p, render=False) - p)
+            
+        errors = np.vstack(errors)
+        error_count = len(np.flatnonzero(errors))
+        P_error = np.true_divide(error_count, N * pattern_count)
+            #bar.next()
+    capacity = np.true_divide(pattern_count,N)
+    
+
+    return (P_error, capacity)    
         
 if __name__ == '__main__':
     ej_1()
