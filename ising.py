@@ -79,10 +79,8 @@ class IsingModel():
 
     def _acceptWithProb(self, delta_energy):
         if (np.random.random() <= self._acceptanceProb(delta_energy) ): # random() returns value between 0 and 1
-            print("ACCEPT PROB: true")
             return True
         else:
-            print("ACCEPT PROB: false")
             return False
 
     def _updateLattice(self, index, delta_energy):
@@ -109,28 +107,30 @@ class IsingModel():
 
     def run(self):     
         plt.ion()
-        _, axs = plt.subplots(nrows=3, ncols=1)
+        _, axs = plt.subplots(nrows=2, ncols=1)
         axs[1].set_title('Magnetization Curve')
-        axs[1].set_xlabel('Temperature: {}. Energy: {}'.format(self.temperature,self.energy))  
+        
         
         it = 0
         while ( self.isNotMagnetized() ):
             it += 1
             self._iterate()       
             self.render_plot(axs,it)
-        self.render_plot(axs,it)
+        
+        self.render_plot(axs,it,forced=True)
         input("Press Enter to exit...")
 
-    def render_plot(self, axs,it):
+    def render_plot(self, axs,it, forced=False):
         # Renders image only if it's in the last step count
-        if self.iterations_per_temp_count == ITERATIONS_PER_TEMPERATURE:
+        if self.iterations_per_temp_count == ITERATIONS_PER_TEMPERATURE or forced:
             axs[0].clear()
             axs[0].set_title('Ising Model Simulation')
             axs[0].imshow(self.lattice,vmin=-1, vmax=1)
             
             axs[1].semilogx(self.temperature, self.magnetization,"*b")
-            axs[2].plot(it,self.temperature,'*r') 
-            axs[2].set_xlabel('Temperature: {}. Energy: {}'.format(self.temperature,self.energy)) 
+            axs[1].set_xlabel('Temperature: {}. Energy: {}'.format(self.temperature,self.energy))  
+            #axs[2].plot(it,self.temperature,'*r') 
+            #axs[2].set_xlabel('Temperature: {}. Energy: {}'.format(self.temperature,self.energy)) 
             plt.show()
             plt.pause(1e-12)
 

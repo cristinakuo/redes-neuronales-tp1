@@ -6,7 +6,7 @@ plt.ion()
 
 
 def main():
-    myIsing = IsingModel(rows=4,cols=5,init_temp=20)
+    myIsing = IsingModel(rows=10,cols=10,init_temp=20)
     myIsing.run()
 
 
