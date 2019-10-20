@@ -26,3 +26,14 @@ def gen_list_of_patterns(N_neurons, M_patterns):
     for i in range(M_patterns):
         patterns_list.append(gen_random_pattern(N_neurons))
     return patterns_list
+
+def sum_patterns(pattern_1, pattern_2):
+    if len(pattern_1) != len(pattern_2):
+        raise Exception("Sum of patterns: Length mismatch");
+    else:
+        result = pattern_1 + pattern_2
+        result = np.vectorize(sgn)(result)
+        return result
+
+def invert_pattern(pattern):
+    return np.array([x*(-1) for x in pattern])
