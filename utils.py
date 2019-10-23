@@ -37,3 +37,10 @@ def sum_patterns(pattern_1, pattern_2):
 
 def invert_pattern(pattern):
     return np.array([x*(-1) for x in pattern])
+
+def array_is_in(array, list_arrays):
+    for arr in list_arrays:
+        if np.array_equal(array,arr):
+            return True
+    return False
+
