@@ -101,7 +101,6 @@ class HopfieldNet:
         return -0.5*sum(np.dot(self.W, s))
 
     def evaluate_net(self, s, refresh_type='async', max_iteration=20, render=False):
-        log.info("Evaluating net...")
         if not self.W.any():
             raise("No synaptic weight matrix trained.")
         
