@@ -76,12 +76,12 @@ class HopfieldNet:
         
         refreshed_s = np.copy(s)
         
-        for i in tqdm(np.random.permutation(self.N)):
+        for i in (np.random.permutation(self.N)):
             refreshed_s[i] = sgn(sum(self.W[i,:]*refreshed_s))
             
             if render and refreshed_s[i] != s[i]:
                 im, bitmap = image.render_pixel(im, bitmap, refreshed_s[i], i%self.cols, int(np.floor(i/self.cols)))
-        return refreshed_s
+        return np.array(refreshed_s)
 
     def refresh_synchronic(self, s, render):
         refreshed = [sgn(x) for x in np.dot(self.W,s)]
@@ -89,7 +89,7 @@ class HopfieldNet:
         if render:
             im, bitmap = image.render_image(refreshed, self.rows, self.cols)
         
-        return refreshed
+        return np.array(refreshed)
 
     def get_energy(self,s):
         if not self.W.any():
@@ -101,6 +101,7 @@ class HopfieldNet:
         return -0.5*sum(np.dot(self.W, s))
 
     def evaluate_net(self, s, refresh_type='async', max_iteration=20, render=False):
+        log.info("Evaluating net...")
         if not self.W.any():
             raise("No synaptic weight matrix trained.")
         
@@ -108,22 +109,24 @@ class HopfieldNet:
             raise("Dimensions mismatch.")
 
         if refresh_type == 'async':
-            refresh = self.refresh_asynchronic
+            refreshed = self.refresh_asynchronic(s,render)
         elif refresh_type == 'sync':
-            refresh = self.refresh_synchronic
+            refreshed = self.refresh_synchronic(s,render)
         else:
             raise("Not a refresh type.")
+        
+        return refreshed
 
     
         current_H = 0
         previous_H = 0
         for i in range(max_iteration):
-            log.info("Iteration {}".format(i+1))
+            #log.info("Iteration {}".format(i+1))
             
-            log.info("Refreshing net...")    
+            #log.info("Refreshing net...")    
             s = refresh(s, render=render)
             
-            log.info("Calculating energy...")
+            #log.info("Calculating energy...")
             previous_H = current_H
             current_H = self.get_energy(s)
             
