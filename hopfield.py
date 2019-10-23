@@ -47,6 +47,9 @@ class HopfieldNet:
         
         self.patterns.append(p)
 
+    def load_patterns_list(self,patterns_list):
+        for p in patterns_list:
+            self.load_pattern_arr(p)
 
     def train(self):
         log.info("Training net...")
