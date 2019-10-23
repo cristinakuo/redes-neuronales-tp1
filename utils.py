@@ -1,4 +1,5 @@
 import numpy as np
+from itertools import product
 
 
 def sgn(n,ref=0):
@@ -44,3 +45,42 @@ def array_is_in(array, list_arrays):
             return True
     return False
 
+def get_all_combinations(patterns_list):
+    combinations = []
+    L = len(patterns_list)
+
+    permutations_tuples = list(product([1,-1],repeat=L))
+    sign_permutations = []
+    for pr in permutations_tuples:
+        sign_permutations.append(np.array(pr))
+
+    if len(sign_permutations) != np.power(2,L):
+         log.error("Permutations not doing right. Bye.")
+         sys.exit(1)
+
+    patterns_arr = np.array(patterns_list)
+    for signs in sign_permutations:
+        res = patterns_arr*signs[:,None]
+        res = np.sum(res,axis=0)
+        res = np.vectorize(sgn)(res)
+        combinations.append(res)
+
+    return combinations
+
+def find_inverted_spurious(hopfieldNet,patterns_list):
+    spurious_count = 0
+    for pattern in patterns_list:
+        refreshed = hopfieldNet.evaluate_net(invert_pattern(pattern),'async')
+        if not array_is_in(refreshed,patterns_list):
+            spurious_count += 1
+    return spurious_count
+
+def find_combinations_spurious(hopfieldNet,patterns_list):
+    spurious_count = 0
+    combinations = get_all_combinations(patterns_list)        
+    
+    for comb in combinations:
+        refreshed = hopfieldNet.evaluate_net(comb,'async')
+        if not array_is_in(refreshed,patterns_list):
+            spurious_count += 1
+    return spurious_count   
